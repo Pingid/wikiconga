@@ -1,12 +1,13 @@
 {
-  "name": "example-create-react-app-express",
+  "name": "wiki-poem",
   "version": "1.0.0",
-  "description": "Example on using create-react-app with a Node Express Backend",
+  "description": "A Oulipian inspired poem generator",
   "license": "MIT",
+  "main": "index.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node index.js",
     "client": "cd client && yarn start",
-    "server": "nodemon server.js",
+    "server": "nodemon index.js",
     "heroku-postbuild": "cd client && yarn --production=false && yarn run build",
     "dev": "concurrently --kill-others-on-fail \"yarn server\" \"yarn client\""
   },
