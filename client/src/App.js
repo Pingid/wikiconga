@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
+import ReactMarkdown from 'react-markdown';
 
 import './styles/App.css';
 
@@ -7,44 +8,61 @@ import { get_short_poem } from './utils/api';
 
 import Loader from './components/Loader';
 
-const Input = styled.input`
-  font-size: .5rem;
-  flex: 1 1 100%;
-  border: 2px solid black;
+const Form = styled.form`
+  border: 1px solid #555555;
   border-radius: 0;
+`
+const Input = styled.input`
+  font-size: .618rem;
+  flex: 1 1 100%;
+  border-radius: 0;
+  border: none;
+  outline: none;
   &:focus { outline: none }
 `
 
 const GenerateButton = styled.button`
   flex: 1 1 10rem;
   border: none;
-  background-color: #1b1b1b;
-  color: white;
+  border-left: 1px solid #999;
   cursor: pointer
 `
 
 const Wrapper = styled.div`
-  max-width: 40rem;
-  margin: 2rem auto;
-  padding: 0rem 2rem;
+  padding: 6vh 10vw;
 `
 
-const Poem = styled.p`
-  max-width: 30rem;
+const Meta = styled.div`
+  width: 100%;
+  font-size: .618rem;
+  line-height: 13px
 `
+
+const aboutMarkdown = `Inspired by the [Oulipian](http://oulipo.net/) poem structure ['Littérature définitionnelle'](http://oulipo.net/fr/contraintes/litterature-definitionnelle), developed by [Raymond Queneau](https://en.wikipedia.org/wiki/Raymond_Queneau), [Marcel Breuer](https://en.wikipedia.org/wiki/Marcel_Breuer) and [Georges Perec](https://en.wikipedia.org/wiki/Georges_Perec), which recursively generates poems by substituting words for there dictionary definitions. This tool generates poems by taking the words up until the first hyperlink on a Wikipedia page and then following that hyperlink and concatenating the initial text from the next link, it repeats this process recursively until a page is repeated.`
 
 class App extends Component {
   state = { 
     search: '',
-    poem: '',
-    network: { fetching: false, err: '' }
+    poem: [],
+    network: { fetching: false, err: '' },
+    currentWiki: ''
   };
   render() {
     const { search, poem, network } = this.state;
     return (
       <Wrapper className="">
-        <p className="m0 pb2 pl2" style={{ color: 'black', fontSize: '.5rem' }}>Copy and paste a wikipedia URL into box</p>
-        <div className="flex">
+        <h4 className="m0 mt3">Wikiconga</h4>
+        <Meta className="pt2 pl2">
+          Author: <a href="http://danbeaven.co.uk">Dan Beaven</a>
+          <br />
+          Blog post: <a href="http://www.danbeaven.co.uk/blog/#/article/Who_are_the_Oulipo">Who are the Oulipo</a>
+        </Meta>
+        <div className="my3 markdown">
+          <ReactMarkdown
+            source={aboutMarkdown}
+          />
+        </div>
+        <Form className="flex items-center" style={{ maxWidth: '30rem' }} onSubmit={this._handleGenerate.bind(this)}>
           <Input
             type="text"
             value={search}
@@ -54,20 +72,31 @@ class App extends Component {
           <GenerateButton 
             className="caps"
             onClick={this._handleGenerate.bind(this)}>
-            { network.fetching ? <Loader /> : 'Generate' }
+            <p className="m0 p0">{ network.fetching ? <Loader /> : 'Generate' }</p>
           </GenerateButton>
-        </div>
+        </Form>
         <p className="m0 pl2 flex items-center" style={{ color: 'red', fontSize: '.5rem', height: '2rem' }}>{network.err}</p>
-        <Poem className="mt0 px2">{poem}</Poem>
+        <p className="mt0" style={{ minHeight: '27vh' }}>
+          {
+            poem.map((x, i) => (
+              <span
+                key={i}
+                onMouseEnter={() => this.setState({ currentWiki: x.href })} 
+                onMouseLeave={() => this.setState({ currentWiki: '' })}>
+                <a href={x.href}>{x.text}</a><br />
+              </span>
+            ))
+          }
+        </p>
       </Wrapper>
     );
   }
-  _handleGenerate() {
+  _handleGenerate(e) {
     const { search } = this.state;
     const isWikiPage = new RegExp('wikipedia.org\/wiki', 'gi')
+    if (e) { e.preventDefault() }
     if (isWikiPage.test(search)) {
-      const page = new RegExp('(wiki\/)(.*)[#?]', 'gi')
-      return this._getPoem(page.exec(search + '#')[2].toLowerCase())
+      return this._getPoem(search)
     }
     return this.setState({ 
       network: { 
@@ -82,7 +111,7 @@ class App extends Component {
       this.setState({ network: { fetching: true, err: 'Wait for last poem' } })
       return;
     }
-    return get_short_poem('/wiki/' + wikiPage)
+    return get_short_poem(wikiPage)
       .then(res => {
         if (res.err) {
           console.log(res.err)
@@ -93,9 +122,12 @@ class App extends Component {
           network: { fetching: false, err: '' }
         })
       })
-      .catch(err => this.setState({
-        network: { fetching: false, err: 'The was an error try different page' }
-      }));
+      .catch(err => {
+        console.log(err)
+        return this.setState({
+          network: { fetching: false, err: 'The was an error try different page' }
+        })
+      });
   }
 }
 

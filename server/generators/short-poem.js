@@ -22,11 +22,11 @@ const grabTextUntilFirstLink = ({ text, links }) => text
 
 const constructPoem = (poem, wikiPage, visitedPages) => {
   if (wikiPage) {
-    return rp(`https://en.wikipedia.org${wikiPage}`)
+    return rp(wikiPage)
       .then(safe(parseWiki))
       .then(grabTextUntilFirstLink)
       .then(({ text, nextLink }) => {
-        const addLine = poem + text.trim() + '. ';
+        const addLine = R.append({ text: text.trim() + '. ', href: wikiPage }, poem);
         if (R.contains(nextLink, visitedPages)) {
           return addLine;
         }
@@ -35,6 +35,6 @@ const constructPoem = (poem, wikiPage, visitedPages) => {
     }
 }
 
-make_short_poem = (page) => constructPoem('', page, [page])
+make_short_poem = (page) => constructPoem([], page, [page])
 
 module.exports = make_short_poem
