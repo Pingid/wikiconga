@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Wikiconga",
+  "name": "Oulipian inspired wikipedia generated poetry",
   "icons": [
     {
       "src": "favicon.ico",
