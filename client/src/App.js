@@ -4,7 +4,7 @@ import ReactMarkdown from 'react-markdown';
 
 import './styles/App.css';
 
-import { get_short_poem } from './utils/api';
+import { get_short_poem, get_random_URI } from './utils/api';
 
 import Loader from './components/Loader';
 
@@ -48,6 +48,16 @@ const PoemLine = styled.span`
   }
 `
 
+const MiniButton = styled.div`
+  position: relative;
+  padding: .5rem;
+  text-align: center;
+  color: blue; 
+  font-size: .618rem; 
+  border: .5px solid black; 
+  cursor: pointer;
+`
+
 const aboutMarkdown = `Inspired by the [Oulipian](http://oulipo.net/) poem structure ['Littérature définitionnelle'](http://oulipo.net/fr/contraintes/litterature-definitionnelle), developed by [Raymond Queneau](https://en.wikipedia.org/wiki/Raymond_Queneau), [Marcel Breuer](https://en.wikipedia.org/wiki/Marcel_Breuer) and [Georges Perec](https://en.wikipedia.org/wiki/Georges_Perec), which recursively generates poems by substituting words for there dictionary definitions. This tool generates poems by taking the words up until the first hyperlink on a Wikipedia page and then following that hyperlink and concatenating the initial text from the next link, it repeats this process recursively until a page is repeated.`
 
 class App extends Component {
@@ -77,7 +87,7 @@ class App extends Component {
             type="text"
             value={currentWiki.length > 1 ? currentWiki : search}
             placeholder="https://en.wikipedia.org/wiki/Wiki"
-            className="p2 caps"
+            className="p2"
             onChange={(e) => this.setState({ search: e.target.value })} />
           <GenerateButton 
             className="caps"
@@ -85,7 +95,10 @@ class App extends Component {
             <p className="m0 p0">{ network.fetching ? <Loader /> : 'Generate' }</p>
           </GenerateButton>
         </Form>
-        <p className="m0 pl2 flex items-center" style={{ color: 'red', fontSize: '.5rem', height: '2rem' }}>{network.err}</p>
+        <div className="flex items-center mb2" style={{ }}>
+          <MiniButton className="caps mt1 mr1" onClick={this._handleRandom.bind(this)}>random</MiniButton>
+          <p className="" style={{ color: 'red', fontSize: '.618rem' }}>{network.err}</p>
+        </div>
         <p className="mt0" style={{ 
           minHeight: '27vh', 
           opacity: network.fetching ? .5 : 1,
@@ -106,16 +119,27 @@ class App extends Component {
       </Wrapper>
     );
   }
+  _handleRandom() {
+    this.setState({ network: { fetching: true, err: '' } });
+    get_random_URI()
+      .then(x => {
+        this.setState({ search: x.uri, network: { fetching: false, err: '' } });
+        return this._getPoem(x.uri);
+      })
+      .catch(err => {
+        this.setState({ network: { fetching: false, err: 'Something went wrong try again' } });
+      })
+  }
   _handlePoemClick(e) {
-    const { currentWiki, search } = this.state;
-    this.state.search = currentWiki;
+    const { currentWiki } = this.state;
+    this.setState({ search: currentWiki });
     this._handleGenerate.call(this, e);
   }
   _handleGenerate(e) {
     if (e) { e.preventDefault() }
 
-    const { search, currentWiki } = this.state;
-    const isWikiPage = new RegExp('wikipedia.org\/wiki', 'gi')
+    const { search } = this.state;
+    const isWikiPage = new RegExp('wikipedia.org/wiki', 'gi')
 
     if (isWikiPage.test(search)) {
       return this._getPoem(search)
@@ -129,26 +153,21 @@ class App extends Component {
     })
   }
   _getPoem(wikiPage) {
-    this.setState({ network: { fetching: true, err: '' } });
     if (this.state.network.fetching) {
       this.setState({ network: { fetching: true, err: 'Wait for last poem' } })
       return;
     }
+    this.setState({ network: { fetching: true, err: '' } });
     return get_short_poem(wikiPage)
       .then(res => {
-        if (res.err) {
-          console.log(res.err)
-          return this.setState({ network: { fetching: false, err: 'Bad URL try different page' }})
-        }
         return this.setState({ 
           poem: res.poem,
           network: { fetching: false, err: '' }
         })
       })
       .catch(err => {
-        console.log(err)
         return this.setState({
-          network: { fetching: false, err: 'The was an error try different page' }
+          network: { fetching: false, err: 'Something went wrong try again or different page' }
         })
       });
   }

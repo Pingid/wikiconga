@@ -22,7 +22,7 @@ const grabTextUntilFirstLink = ({ text, links }) => text
 
 const constructPoem = (poem, wikiPage, visitedPages) => {
   if (wikiPage) {
-    return rp(wikiPage)
+    return rp(wikiPage, { timeout: 15000, followAllRedirects: true })
       .then(safe(parseWiki))
       .then(grabTextUntilFirstLink)
       .then(({ text, nextLink }) => {

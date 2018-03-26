@@ -3,12 +3,19 @@ const options = opts => Object.assign({
   headers: new Headers({ 'Content-Type': 'application/json' }) 
 }, opts);
 
-export const get_short_poem = async (wikipage) => {
-	const response = await fetch('/api/short-poem', options({ 
+export const get_random_URI = () => fetch('/api/random-wiki', options())
+	.then(res => res.json())
+	.then(res => new Promise((resolve, reject) => {
+		if (res.err || !res.uri) return reject(res.err);
+		return resolve(res);
+	}))
+
+export const get_short_poem = (wikipage) => fetch('/api/short-poem', options({ 
 	  method: 'POST', 
 	  body: JSON.stringify({ page: wikipage }),
-	}));
-	const body = await response.json();
-	if (response.status !== 200) throw Error(body.message);
-	return body;
-}	
+	}))
+	.then(res => res.json())
+	.then(res => new Promise((resolve, reject) => {
+		if (res.err || !res.poem) return reject(res.err);
+		return resolve(res);
+	}))

@@ -1,14 +1,22 @@
 const make_short_poem = require('../generators/short-poem');
 const poems = require('../generators/poems');
+const rp = require('request-promise')
 
 module.exports = (app) => {
 
-	app.post('/api/short-poem', (req, res) => {
-		// poems.firstRepeat(req.body.page)
-		// 	.then(poem => res.send({ poem }))
-		// 	.catch(err => res.send({ poem: '', err }))
-		make_short_poem(req.body.page)
-			.then(poem => res.send({ poem }))
-			.catch(err => res.send({ poem: '', err }))
+	app.get('/api/random-wiki', (req, res) => {
+		rp('https://en.wikipedia.org/wiki/Special:Random', {
+		  timeout: 2000,
+		  resolveWithFullResponse: true,
+		  followAllRedirects: true })
+		.then(x => res.send({ uri: x.request.uri.href }))
+		.catch(err => res.send({ uri: null, err }))
+	})
+
+	app.post('/api/short-poem', async (req, res) => {
+		let page = req.body.page;
+		make_short_poem(page)
+			.then(poem => res.send({ page, poem }))
+			.catch(err => res.send({ page, poem: '', err }))
 	});
 }
