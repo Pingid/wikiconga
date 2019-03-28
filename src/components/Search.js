@@ -20,6 +20,18 @@ const Wrapper = styled.div`
   }
 `;
 
+const SearchInput = styled.input`
+  transition: .2s;
+  &::-webkit-input-placeholder {
+    color: #ddd;
+    text-transform: capitalize;
+  }
+  &:focus {
+    color: #fff !important;
+    &::-webkit-input-placeholder { color: #555; }
+  }
+`;
+
 let request = '';
 
 const getSuggestions = (search) => {
@@ -42,6 +54,8 @@ export default (props) => {
   const [ url, setUrl ] = useState('');
   const [ suggestions, setSuggestions ] = useState([]);
   const [ selectOpen, setSelect ] = useState(false);
+
+  const [ delay, setdelay ] = useState(false);
   
   if (props.url.length > 1 && props.url !== oldURL && props.url !== url) { 
     setoldURL(props.url); setUrl(props.url); setTitle(props.title); setSuggestions([]) 
@@ -64,6 +78,8 @@ export default (props) => {
   const handleSubmit = (e) => { 
     e.preventDefault(); 
     if (valid) { props.onSearch(url); }
+    setdelay(true);
+    setTimeout(() => setdelay(false), 2000)
   }
 
   return (
@@ -76,8 +92,8 @@ export default (props) => {
           value={url}
           onChange={handleURL} /></small>
         <div className="w-100">
-          <input
-            className={classNames('bg-black white w-100 pl2 pv3 bl bt br')}
+          <SearchInput
+            className={classNames('bg-black off-white w-100 pl2 pv3 bl bt br')}
             type="text"
             placeholder="search"
             value={title}
@@ -97,7 +113,9 @@ export default (props) => {
             </DropDown>
           </div>
         </div>
-        <button disabled={!valid} type="submit" className={classNames('pa2 bg-black bw0 white pointer mv2', { 'o-20': !valid })}>concatenate</button>
+        <button disabled={!valid} type="submit" className={classNames('pa2 bw0 pointer mv2', { 'off-white bg-black hover-white': (valid && !delay), 'o-20 bg-white black': (!valid || delay) })}>
+          concatenate
+        </button>
       </form>
     </Wrapper>
   )
