@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import * as R from 'ramda';
-
 import Poem from '../utils/poem';
+import styled from 'styled-components';
 
-const buildPoem = (url: string): { lines: { link: string, text: string }[], poem: Poem, archive: Poem[] } => {
+const buildPoem = (url: string): { lines: { title: string, link: string, text: string }[], poem: Poem, archive: Poem[] } => {
   const [ archive, setArchive ] = useState([]);
   const [ poem, setPoem ] = useState(null);
   const [ lines, updateLines ] = useState([]);
@@ -26,15 +24,26 @@ const buildPoem = (url: string): { lines: { link: string, text: string }[], poem
   return { lines, poem, archive };
 }
 
-export default (props: { url: string, onRedirect: (n: string) => void }): JSX.Element => {
+const Title = styled.p`
+  flex: 0 0 20vw;
+  @media (max-width: 500px) {
+    flex: 0 0 6rem;
+    width: 6rem;
+    overflow: hidden;
+  }
+`;
+
+export default (props: { url: string, onRedirect: (page: { title: string, link: string }) => void }): JSX.Element => {
   const { lines, poem } = buildPoem(props.url);
 
   return (
-    <div>
+    <div className="mb5">
       { lines.map((x, i) => (
-        <div className="flex" key={x.title + i}>
-          <p className="w4 tr o-2">{x.title}</p>
-          <p className="pl2" onClick={() => props.onRedirect(x.link)} key={i}>{x.text}</p>
+        <div className="flex pt2" key={x.title + i}>
+          <Title className="ma0 w4 tr o-40 pr3 pl1 pointer hover-blue" onClick={() => props.onRedirect(x)}>
+            <small>{x.title}</small>
+          </Title>
+          <p className="ma0 pr3" style={{ flex: '0 1 50rem' }} key={i}>{x.text}</p>
         </div>
       ))}
     </div>

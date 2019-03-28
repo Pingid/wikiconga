@@ -10,7 +10,7 @@ const getTextUntil = (text: string, word: string): string =>
 
 const getData = async (url: string): Promise<{ title: string, text: string, links: [{}] }> => {
 	// Get Paragraph and links data
-	const { data } = await axios({ url: `http://localhost:1234/?adress=https://kmo5ch0uh5.execute-api.eu-west-2.amazonaws.com/dev/page?url=${url}` });
+	const { data } = await axios({ url: `https://kmo5ch0uh5.execute-api.eu-west-2.amazonaws.com/dev/page?url=${url}` });
 
 	// Remove anything inside parenthesis and newlines in paragraphs
 	const text = data.paragraphs.join('\n')
@@ -50,7 +50,7 @@ export default class Poem {
 	// Events
 	on(event: string, f: (n: any) => void): void { this[event] = f; } // Event event listener
 	finish(): void { if (this['done']) { this['done'](this.state) } this.finished = true; }
-	build(...args): void { console.log('args', args); return this[this.type](...args) }
+	build(...args): void { return this[this.type](...args) }
 
 	// Data
 	getState(): stateData { return this.state }
