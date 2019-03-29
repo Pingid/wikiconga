@@ -38,14 +38,14 @@ interface Search extends state {
 
 const Search: React.FC<Search> = ({ poemURL, title, url, setState }) => {
 
-    const handleChangeTitle = (newValue: string) => setState({ title: newValue  });
+    const handleChangeTitle = (newValue: string, { action }) => action === 'input-change' && setState({ title: newValue  });
     const handleSelectSuggestion = (x) => setState({ url: x.link, title: x.title  });
     const handleSubmit = e => { e.preventDefault(); setState({ poemURL: url }) };
 
     const buttonValid = (poemURL !== url);
 
     return (
-        <Wrapper className="border border-black w-full mb4 pr3">
+        <Wrapper className="border border-black w-full pr3">
             <form className="flex flex-wrap" onSubmit={handleSubmit}>
                 <small className="w-100"><input
                     className="bw0 w-100 pl2 pv2 o-40"
@@ -67,7 +67,7 @@ const Search: React.FC<Search> = ({ poemURL, title, url, setState }) => {
                     theme={(theme) => ({ ...theme, borderRadius: 0, colors: { ...theme.colors, primary: 'black', }, })}
                 />
                 <button type="submit" className={classNames('pa2 ba pointer mv2', { 'ba b--black hover-blue': buttonValid, 'o-20 bg-white black': !buttonValid })}>
-                    go
+                    generate
                 </button>
             </form>
         </Wrapper>
