@@ -25,9 +25,9 @@ const loadOptions= (inputValue: string, callback: (x: []) => void): Promise<{ va
                 description: data[2][i],
                 link: data[3][i]
             })))
-            .then((data) => data.map(x => ({ ...x, value: x.title, label: x.title })) )
+            .then((data) => data.map(x => ({ ...x, value: x.title, label: x.title })))
     }
-    return Promise.resolve([]);
+    return Promise.resolve([opts]);
 }
 
 interface state { url?: string, title?: string, poemURL?: string; };
@@ -39,7 +39,13 @@ interface Search extends state {
 const Search: React.FC<Search> = ({ poemURL, title, url, setState }) => {
 
     const handleChangeTitle = (newValue: string, { action }) => action === 'input-change' && setState({ title: newValue  });
-    const handleSelectSuggestion = (x) => setState({ url: x.link, title: x.title  });
+    const handleSelectSuggestion = (x) => {
+        if (x.value === 'Random') {
+            return axios.get('https://kmo5ch0uh5.execute-api.eu-west-2.amazonaws.com/dev/random')
+                .then(x => setState({ url: x.data, title: 'Random' }))
+        }
+        return setState({ url: x.link, title: x.title  });
+    }
     const handleSubmit = e => { e.preventDefault(); setState({ poemURL: url }) };
 
     const buttonValid = (poemURL !== url);
@@ -60,6 +66,7 @@ const Search: React.FC<Search> = ({ poemURL, title, url, setState }) => {
                     cacheOptions
                     placeholder="search wikipedia"
                     inputValue={title}
+                    defaultOptions={[{ value: 'Random', label: 'Random' }]}
                     loadOptions={loadOptions}
                     onInputChange={handleChangeTitle} 
                     onChange={handleSelectSuggestion}
