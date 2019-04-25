@@ -1,0 +1,6 @@
+endpoint: http://wikic-publi-k7xafjambn29-801764650.eu-west-2.elb.amazonaws.com/
+datamodel: datamodel.prisma
+
+generate:
+  - generator: typescript-client
+    output: ../prisma-client/

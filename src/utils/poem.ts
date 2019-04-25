@@ -10,7 +10,11 @@ const getTextUntil = (text: string, word: string): string =>
 
 const getData = async (url: string): Promise<{ title: string, text: string, links: [{}] }> => {
 	// Get Paragraph and links data
-	const { data } = await axios({ url: `https://kmo5ch0uh5.execute-api.eu-west-2.amazonaws.com/dev/page?url=${url}` });
+	const { data } = await axios({ 
+		method: 'POST', 
+		url: `https://kmo5ch0uh5.execute-api.eu-west-2.amazonaws.com/dev/page`,
+		data: { url }
+	});
 
 	// Remove anything inside parenthesis and newlines in paragraphs
 	const text = data.paragraphs.join('\n')
@@ -51,6 +55,7 @@ export default class Poem {
 	on(event: string, f: (n: any) => void): void { this[event] = f; } // Event event listener
 	finish(): void { if (this['done']) { this['done'](this.state) } this.finished = true; }
 	build(...args): void { return this[this.type](...args) }
+	throwError(error) { if (this && this['error']) { this['error'](error) } }
 
 	// Data
 	getState(): stateData { return this.state }
@@ -72,8 +77,8 @@ export default class Poem {
 			}, 'lines')
 			return !this.finished && recurseBuild(next.link)
 		}
-
-		return await recurseBuild(url);
+		
+		return await recurseBuild(url).catch(this.throwError);
 	}
 
 	// Follow links until limit or reach page with no new links
@@ -93,7 +98,7 @@ export default class Poem {
 			return !this.finished && recurseBuild(next.link)
 		}
 
-		return await recurseBuild(url);
+		return await recurseBuild(url).catch(this.throwError);
 	}
 
 }
