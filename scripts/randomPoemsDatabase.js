@@ -4,7 +4,7 @@ const R = require('ramda');
 const { default:Poem } = require('../src/utils/poem')
 const { prisma } = require('../database/client');
 
-const getRandomWikiPage = () => axios.get('https://kmo5ch0uh5.execute-api.eu-west-2.amazonaws.com/dev/random')
+const getRandomWikiPage = () => axios.get('https://dld7d563bh.execute-api.eu-west-2.amazonaws.com/dev/random')
     .then(x => x.data)
     .catch(error => { console.log(error); return getRandomWikiPage() })
 

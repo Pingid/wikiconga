@@ -7,7 +7,7 @@ const getTextUntil = (text, word) => {
 }
 
 const makePoem = async (url, callback = x => x, poem = [], visited = []) => {
-  const { data } = await axios({ url: `https://kmo5ch0uh5.execute-api.eu-west-2.amazonaws.com/dev/page?url=${url}` });
+  const { data } = await axios({ url: `https://dld7d563bh.execute-api.eu-west-2.amazonaws.com/dev/page?url=${url}` });
   const text = data.paragraphs.join('\n')
     .replace(/\(.*?\)/gmi, '')
     .replace(/\[.*?\]/gmi, '')

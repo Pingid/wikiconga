@@ -2,7 +2,7 @@ const { retry } = require('./async-utils');
 const axios = require('axios');
 const ProgressBar = require('progress');
 
-const linksHere = (title, limit=10) => retry(10)(() => axios.get(`https://kmo5ch0uh5.execute-api.eu-west-2.amazonaws.com/dev/whatlinkshere?target=${title}&limit=${limit}`).then(x => x.data));
+const linksHere = (title, limit=10) => retry(10)(() => axios.get(`https://dld7d563bh.execute-api.eu-west-2.amazonaws.com/dev/whatlinkshere?target=${title}&limit=${limit}`).then(x => x.data));
 
 const buildLinksTree = (childLimit, depth, startTitle) => {
     let bar = new ProgressBar(':bar', { total: Math.pow(childLimit, depth) });

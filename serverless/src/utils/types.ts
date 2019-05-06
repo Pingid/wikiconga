@@ -1,1 +1,0 @@
-export interface PoemLine { title: string, link: string, text: string }

@@ -6,7 +6,7 @@ const { reduce:treeReduce } = require('./tree-utils')
 const { default:Poem } = require('../src/utils/poem')
 const { updateFile, onFile } = require('./async-utils');
 
-const getRandomWikiPage = () => axios.get('https://kmo5ch0uh5.execute-api.eu-west-2.amazonaws.com/dev/random')
+const getRandomWikiPage = () => axios.get('https://dld7d563bh.execute-api.eu-west-2.amazonaws.com/dev/random')
     .then(x => x.data)
     .catch(error => { console.log(error); return getRandomWikiPage() })
 

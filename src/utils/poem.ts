@@ -12,7 +12,7 @@ const getData = async (url: string): Promise<{ title: string, text: string, link
 	// Get Paragraph and links data
 	const { data } = await axios({ 
 		method: 'POST', 
-		url: `https://kmo5ch0uh5.execute-api.eu-west-2.amazonaws.com/dev/page`,
+		url: `https://dld7d563bh.execute-api.eu-west-2.amazonaws.com/dev/page`,
 		data: { url }
 	});
 
@@ -68,7 +68,12 @@ export default class Poem {
 			const { visited, lines, pages } = this.state
 			const data = await getData(link);
 			const { text, links, title } = data;
-			const next = R.head(links);
+
+			const next = R.compose(
+				R.head,
+				R.filter(link => text.indexOf(link.text + ' ') > 0)
+			)(links)
+			
 			if (!next || visited.length > limit || R.contains(link, visited) || this.finished) return this.finish();
 			this.setState({
 				pages: R.append(data, pages),
