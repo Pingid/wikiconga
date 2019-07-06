@@ -61,7 +61,7 @@ export default class Poem {
 	getState(): stateData { return this.state }
 
 	// Follow links until first repeat
-	async firstRepeat(url: string, limit = 30) {
+	async firstRepeat(url: string, limit = 100) {
 		this.state = { start: url, lines: [], visited: [], pages: [] };
 
 		const recurseBuild = async (link) => {
@@ -74,7 +74,8 @@ export default class Poem {
 				R.filter(link => text.indexOf(link.text + ' ') > 0)
 			)(links)
 			
-			if (!next || visited.length > limit || R.contains(link, visited) || this.finished) return this.finish();
+			if (!next || visited.length > limit || R.contains(link, visited) || this.finished) { return this.finish(); }
+			
 			this.setState({
 				pages: R.append(data, pages),
 				visited: R.append(link, visited),
